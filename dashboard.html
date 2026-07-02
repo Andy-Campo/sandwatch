@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hourglass</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+    <nav class="nav">
+        <div class="nav_container">
+            <figure class="nav_figure">
+                <img src="./icons/logo.svg" class="nav_logo" alt="Hourglass Logo">
+            </figure>
+
+            <button class="nav_toggle" id="menuToggle" aria-label="Abrir menú">
+                <img src="./icons/menu-open.svg" alt="Abrir menú" class="menu-icon" id="menuIcon">
+            </button>
+
+            <ul class="nav_list" id="navList">
+                <li class="nav_item">
+                    <a href="#" class="nav_link active">Inicio</a>
+                </li>
+                <li class="nav_item">
+                    <a href="#" class="nav_link">Tareas</a>
+                </li>
+                <li class="nav_item">
+                    <a href="#" class="nav_link">Calendario</a>
+                </li>
+                <li class="nav_item">
+                    <a href="hijos.html" class="nav_link">Hijos</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenido principal del dashboard -->
+    <main class="main-content">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>Panel de Control</h1>
+                <button class="btn-primary" id="openTaskForm">+ Asignar nueva tarea</button>
+            </div>
+
+            <!-- Formulario de tareas (oculto inicialmente) -->
+            <div class="task-form-container" id="taskFormContainer">
+                <form class="task-form" id="taskForm">
+                    <h2>Asignar Nueva Tarea</h2>
+
+                    <div class="form-group">
+                        <label for="taskName">Nombre de la tarea</label>
+                        <input type="text" id="taskName" placeholder="Ej: Hacer la tarea de matemáticas" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskSubject">Asignatura</label>
+                        <input type="text" id="taskSubject" placeholder="Ej: Matemáticas, Lengua, Ciencias" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskPriority">Prioridad</label>
+                        <select id="taskPriority" required>
+                            <option value="">Selecciona una prioridad</option>
+                            <option value="baja">Baja</option>
+                            <option value="media">Media</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskDeadline">Fecha límite de entrega</label>
+                        <input type="date" id="taskDeadline" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskChild">Asignar a:</label>
+                        <select id="taskChild" required>
+                            <option value="">Selecciona un hijo</option>
+                            <option value="Carlos">Carlos</option>
+                            <option value="Martha">Martha</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelTask">Cancelar</button>
+                        <button type="submit" class="btn-primary">Asignar tarea</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sección de tareas asignadas -->
+            <div class="tasks-section">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <h2>Tareas Asignadas</h2>
+                    <span id="taskCounter" style="font-size: 0.9rem; color: #666;"></span>
+                </div>
+                <div id="tasksContainer">
+                    <!-- Aquí se mostrarán las tareas -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mensaje de notificación -->
+    <div class="notification" id="notification">
+        ✅ Tarea asignada correctamente
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="form-top">
+                <span>Hourglass</span>
+            </div>
+            <div class="form" id="form">
+                <form class="login">
+                    <h2>Bienvenido</h2>
+                    <p>¡Bienvenido de vuelta! Por favor ingrese sus datos</p>
+                    <div class="input">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" placeholder="ejemplo@direcciondecorreo.com">
+                    </div>
+                    <div class="input">
+                        <label for="password">Contraseña</label>
+                        <input type="password" name="password" id="password" placeholder="Ingrese su contraseña">
+                    </div>
+                    <div class="reminder">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="terms">
+                            <label for="terms">Recordar por 30 días</label>
+                        </div>
+                        <span class="forgot">Olvidé mi contraseña</span>
+                    </div>
+                    <div class="buttons">
+                        <button>Iniciar sesión</button>
+                    </div>
+                    <p class="account">¿No tienes una cuenta? <a href="#" id="sign-up">Regístrate</a></p>
+                </form>
+                <form class="register">
+                    <h2>Crea tu cuenta</h2>
+                    <p>Usa tu correo electrónico para registrarte</p>
+                    <div class="input">
+                        <label for="name">Nombre</label>
+                        <input type="text" name="name" id="name" placeholder="Ingresa un nombre y un apellido">
+                    </div>
+                    <div class="input">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" placeholder="ejemplo@direcciondecorreo.com">
+                    </div>
+                    <div class="input">
+                        <label for="password">Contraseña</label>
+                        <input type="password" name="password" id="password" placeholder="Ingrese su contraseña">
+                    </div>
+                    <div class="buttons">
+                        <button>Registrarse</button>
+                    </div>
+                    <p class="account">¿Ya tienes una cuenta? <a href="#" id="sign-in">Inicia sesión</a></p>
+                </form>
+            </div>
+            <div class="form-bot">
+                <span>© Hourglass 2026</span>
+            </div>
+        </div>
+        <div class="banner" id="banner">
+            <div class="circle"></div>
+            <div class="circle-2"></div>
+        </div>
+        <script src="/script.js"></script>
+</body>
+
+</html>
