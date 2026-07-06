@@ -1,22 +1,13 @@
-const signIn = document.getElementById('sign-in');
-const signUp = document.getElementById('sign-up');
-const form = document.getElementById('form');
-const banner = document.getElementById('banner');
-const loginButton = document.querySelector('.login button');
+// frontend/script.js o dashboard.js
+const API_URL = 'http://localhost:5000/api';
 
-signIn.addEventListener('click', (e) => {
-    e.preventDefault();
-    form.classList.remove('toggle');
-    banner.classList.remove('toggle')
-});
-
-signUp.addEventListener('click', (e) => {
-    e.preventDefault();
-    form.classList.add('toggle');
-    banner.classList.add('toggle');
-});
-
-loginButton.addEventListener('click', (e) => {
-    e.preventDefault(); // Evita que el formulario se envíe
-    window.location.href = 'dashboard.html'; // Redirige al dashboard
-});
+// Ejemplo de petición Fetch para registrar o validar
+async function obtenerHijos() {
+    try {
+        const response = await fetch(`${API_URL}/health`); // Reemplaza /health por tus rutas reales
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error("Error conectando al backend:", error);
+    }
+}
