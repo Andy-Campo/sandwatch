@@ -1,13 +1,11 @@
-// Importamos la función de login desde el archivo donde tienes el fetch
-import { loginUser } from './api.js'; 
+// js/auth-ui.js
 
 const signIn = document.getElementById('sign-in');
 const signUp = document.getElementById('sign-up');
 const form = document.getElementById('form');
 const banner = document.getElementById('banner');
-const loginButton = document.querySelector('.login button');
 
-// --- LÓGICA DE INTERFAZ (NO TOCAR) ---
+// --- LÓGICA DE INTERFAZ ---
 signIn.addEventListener('click', (e) => {
     e.preventDefault();
     form.classList.remove('toggle');
@@ -20,24 +18,43 @@ signUp.addEventListener('click', (e) => {
     banner.classList.add('toggle');
 });
 
-// --- LÓGICA DE LOGIN (MODIFICADA PARA RENDER) ---
-loginButton.addEventListener('click', async (e) => {
-    e.preventDefault(); 
-    
-    // Obtenemos los valores de los inputs del login
+// --- LÓGICA DE LOGIN ---
+document.querySelector('.login button').addEventListener('click', async (e) => {
+    e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    
-    console.log("📍 Conectando con Render...");
 
-    // Llamamos a la función importada que apunta a Render
-    const esExitoso = await loginUser(email, password);
-    
-    if (esExitoso) {
-        console.log("✅ Acceso concedido por Render.");
+    const response = await fetch('/sandwatch/Backend/login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: email, contrasena: password })
+    });
+
+    const result = await response.json();
+    if (result.status === 'success') {
         window.location.href = 'dashboard.html';
     } else {
-        console.error("❌ Credenciales incorrectas.");
-        alert("Usuario o contraseña incorrectos.");
+        alert("❌ " + result.message);
+    }
+});
+
+// --- LÓGICA DE REGISTRO ---
+document.querySelector('.register button').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('name').value;
+    const email = document.getElementById('email-reg').value;
+    const password = document.getElementById('password-reg').value;
+
+    const response = await fetch('/sandwatch/Backend/register.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, correo: email, contrasena: password })
+    });
+
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert("✅ " + result.message);
+    } else {
+        alert("❌ " + result.message);
     }
 });
