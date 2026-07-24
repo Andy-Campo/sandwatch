@@ -283,9 +283,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const reqNumber = document.getElementById('req-number');
     const reqSymbol = document.getElementById('req-symbol');
     const matchStatus = document.getElementById('match-status');
+    const nameInput = document.getElementById('name');
 
     let isPasswordValid = false;
     let doPasswordsMatch = false;
+
+    if (nameInput) {
+        nameInput.addEventListener('input', (e) => {
+            // Reemplaza cualquier número que el usuario escriba de forma instantánea
+            nameInput.value = nameInput.value.replace(/[0-9]/g, '');
+        });
+    }
 
     function validatePasswordRealTime() {
         if (!passwordRegInput) return;
@@ -320,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         isPasswordValid = hasLength && hasLower && hasUpper && hasNumber && hasSymbol;
         validateMatchRealTime();
+
     }
 
     function validateMatchRealTime() {

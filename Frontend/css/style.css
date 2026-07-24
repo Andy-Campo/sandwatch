@@ -12,7 +12,6 @@
     --bg-banner-color: #F4F5F9;
     --border-input-color: #CBCBCB;
     --primary-color: #613DB7;
-
 }
 
 /*Body*/
@@ -28,12 +27,17 @@ body{
 /*Container*/
 .container{
     width: 64rem;
-    height: 40rem;
+    height: 44rem; /* Altura optimizada para dar espacio a los requisitos */
     border-radius: 0.3rem;
     background-color: var(--bg-form-color);
     display: flex;
     justify-content: space-between;
     overflow: hidden;
+    box-sizing: border-box;
+}
+
+.card {
+    box-sizing: border-box;
 }
 
 /*Form*/
@@ -42,6 +46,7 @@ body{
     display: flex;
     flex-direction: column;
     padding: 1rem 1.2rem;
+    box-sizing: border-box;
 }
 
 /*Form - top*/
@@ -79,19 +84,21 @@ body{
     justify-content: center;
     align-items: center;
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Adiós a la barra de desplazamiento */
+    box-sizing: border-box;
+    padding: 2rem 0;
 }
 
-/*Login*/
+/*Login & Register containers*/
 .login,
 .register{
-    width: 55%;
+    width: 65%;
     position: absolute;
     top: 50%;
+    transition: transform 0.8s, opacity 0.8s;
 }
 .login{
     transform: translateY(-50%);
-    transition: transform 0.8s, opacity 0.8s;
     opacity: 1;
 }
 .form.toggle .login{
@@ -101,7 +108,6 @@ body{
 
 .register{
     transform: translateY(100%);
-    transition: transform 0.8s, opacity 0.8s;
     opacity: 0;
 }
 .form.toggle .register{
@@ -111,32 +117,41 @@ body{
 
 .form h2{
     font-weight: 600;
-    font-size: 1.5rem;
-    margin-bottom: 0.8rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.3rem;
 }
 .form p{
-    font-size: 0.8rem;
-    margin-bottom: 1.8rem;
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 /*Inputs*/
 .form .input{
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
-    margin-bottom: 0.9rem;
+    gap: 0.2rem;
+    margin-bottom: 0.6rem;
 }
 .form .input label{
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
 }
 .form .input input{
     font-size: 0.7rem;
     outline: none;
-    border: none;
     border: 1px solid var(--border-input-color);
     border-radius: 0.2rem;
-    padding: 0.5rem;
+    padding: 0.4rem 0.5rem;
+}
+
+/* Indicadores de requisitos de contraseña optimizados */
+#password-requirements {
+    font-size: 0.7rem;
+    margin: 4px 0;
+    text-align: left;
+}
+#password-requirements p {
+    margin: 1px 0 !important;
 }
 
 /*Reminder*/
@@ -144,7 +159,7 @@ body{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 .form .checkbox-container{
     font-size: 0.7rem;
@@ -164,12 +179,13 @@ body{
 .form .buttons{
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
-    margin-bottom: 1rem;
+    gap: 0.4rem;
+    margin-bottom: 0.8rem;
+    margin-top: 0.5rem;
 }
 .form .buttons button{
     width: 100%;
-    padding: 0.7rem;
+    padding: 0.6rem;
     font-size: 0.8rem;
     border-radius: 0.5rem;
     border: none;
@@ -188,7 +204,7 @@ body{
 /*Account*/
 .form .account{
     text-align: center;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 /*Banner*/
@@ -198,6 +214,8 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
 }
 .circle{
     background-color: var(--primary-color);
@@ -219,17 +237,37 @@ body{
     clip-path: inset(0 0 50% 0);
 }
 
+/* Estilos para select de roles */
+.form .input select {
+    font-size: 0.7rem;
+    outline: none;
+    border: 1px solid var(--border-input-color);
+    border-radius: 0.2rem;
+    padding: 0.4rem 0.5rem;
+    background-color: white;
+    cursor: pointer;
+}
+
+.form .input select:focus,
+.form .input input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(97, 61, 183, 0.1);
+}
+
 /*Responsive*/
 @media(max-width:1088px){
     body{
         background-color: var(--bg-form-color);
+        height: auto;
     }
     .container{
         flex-direction: column;
+        width: 100%;
+        height: auto;
     }
     .container .form-container{
         padding: 0;
-        height: 80%;
+        height: auto;
         order: 2;
     }
     .form-top,.form-bot{
@@ -237,10 +275,8 @@ body{
     }
     .container .banner{
         width: 100%;
-        height: 20%;
+        height: 8rem;
         order: 1;
-        margin-top: 2rem;
-        margin-bottom: 2.5rem;
         background-color: transparent;
     }
     .circle{
@@ -252,56 +288,18 @@ body{
         height: 6rem;
     }
     .form .login,.form .register{
-        width: 18rem;
-        height: 100%;
+        width: 85%;
+        position: relative;
+        transform: none !important;
+        margin: 0 auto;
+    }
+    .form.toggle .login {
+        display: none;
+    }
+    .form:not(.toggle) .register {
+        display: none;
     }
     .form h2, .form p{
         text-align: center;
-    }
-}
-@media(max-width:350px){
-    .form .login,
-    .form .register{
-        width: 90%;
-        height: 100%;
-    }
-}
-
-/* Estilos adicionales para select de roles */
-.form .input select {
-    font-size: 0.7rem;
-    outline: none;
-    border: none;
-    border: 1px solid var(--border-input-color);
-    border-radius: 0.2rem;
-    padding: 0.5rem;
-    background-color: white;
-    cursor: pointer;
-    appearance: auto;
-}
-
-.form .input select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(97, 61, 183, 0.1);
-}
-
-/* Mensaje de rol en el banner */
-.role-indicator {
-    position: absolute;
-    bottom: 2rem;
-    font-size: 0.8rem;
-    color: var(--primary-color);
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 0.3rem 1rem;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-/* Ajustes responsivos */
-@media(max-width:1088px){
-    .form .input select {
-        font-size: 0.8rem;
-        padding: 0.6rem;
     }
 }
