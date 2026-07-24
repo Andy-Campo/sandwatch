@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Hijos - Hourglass</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/hijos.css">
+    <style>
+        /* ===== ESTILOS PARA VALIDACIONES ===== */
+        .form-group {
+            position: relative;
+        }
+
+        .validation-message {
+            display: none;
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.2rem;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .validation-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .validation-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .validation-message.show {
+            display: block;
+        }
+
+        .input-with-validation {
+            position: relative;
+        }
+
+        .input-with-validation input,
+        .input-with-validation select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid var(--border-input-color);
+            border-radius: 0.3rem;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-with-validation input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(97, 61, 183, 0.1);
+        }
+
+        .input-with-validation input.invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
+
+        .input-with-validation input.valid {
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        /* ===== CONTADOR DE CARACTERES ===== */
+        .char-counter {
+            font-size: 0.7rem;
+            color: #999;
+            text-align: right;
+            margin-top: 0.2rem;
+        }
+
+        .char-counter .current {
+            font-weight: 600;
+        }
+
+        .char-counter .limit {
+            color: #666;
+        }
+
+        .char-counter.warning .current {
+            color: #ffc107;
+        }
+
+        .char-counter.danger .current {
+            color: #dc3545;
+        }
+
+        /* ===== CAMPO DE EDAD ===== */
+        .input-with-validation input[type="text"]#childAge {
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='20' height='20' rx='2'%3E%3C/rect%3E%3Cline x1='8' y1='2' x2='8' y2='22'%3E%3C/line%3E%3Cline x1='16' y1='2' x2='16' y2='22'%3E%3C/line%3E%3Cline x1='2' y1='8' x2='22' y2='8'%3E%3C/line%3E%3Cline x1='2' y1='16' x2='22' y2='16'%3E%3C/line%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 35px;
+        }
+
+        .input-with-validation input[type="text"]#childAge:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(97, 61, 183, 0.1);
+        }
+
+        /* ===== EFECTO DE VIBRACIÓN ===== */
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .input-with-validation input[type="text"]#childAge.shake {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== INDICADORES DE CAMPO OBLIGATORIO ===== */
+        .form-group label .required {
+            color: #dc3545;
+            margin-left: 2px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .validation-message {
+                font-size: 0.7rem;
+            }
+
+            .char-counter {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav">
+        <div class="nav_container">
+            <figure class="nav_figure">
+                <img src="./icons/logo.svg" class="nav_logo" alt="Hourglass Logo">
+            </figure>
+
+            <!-- Botón hamburguesa -->
+            <button class="nav_toggle" id="menuToggle" aria-label="Abrir menú">
+                <img src="./icons/menu-open.svg" alt="Abrir menú" class="menu-icon" id="menuIcon">
+            </button>
+
+            <ul class="nav_list" id="navList">
+                <li class="nav_item">
+                    <a href="dashboard.html" class="nav_link">Inicio</a>
+                </li>
+                <li class="nav_item">
+                    <a href="reporte.html" class="nav_link">Reporte</a>
+                </li>
+                <li class="nav_item">
+                    <a href="calendario.html" class="nav_link">Calendario</a>
+                </li>
+                <li class="nav_item">
+                    <a href="hijos.html" class="nav_link active">Hijos</a>
+                </li>
+                <li class="nav_item">
+                    <a href="#" id="logoutLink" class="nav_link" style="color: #f44336; font-weight: 600;">
+                        🚪 Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>👨‍👩‍👧‍👦 Mis Hijos</h1>
+                <button class="btn-primary" id="openChildForm">+ Registrar nuevo hijo</button>
+            </div>
+
+            <!-- Formulario para registrar hijo -->
+            <div class="child-form-container" id="childFormContainer">
+                <form class="child-form" id="childForm" novalidate>
+                    <h2>Registrar Nuevo Hijo</h2>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 1.5rem;">
+                        Cada hijo tendrá su propio email y contraseña para iniciar sesión
+                    </p>
+
+                    <!-- NOMBRE COMPLETO -->
+                    <div class="form-group">
+                        <label for="childName">
+                            Nombre completo
+                            <span class="required">*</span>
+                            <span style="font-weight: normal; font-size: 0.75rem; color: #999;">
+                                (Máx. 50 caracteres)
+                            </span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="text" id="childName" placeholder="Ej: Carlos Pérez"
+                                maxlength="50" autocomplete="off">
+                            <div class="char-counter">
+                                <span class="current">0</span>
+                                <span class="limit">/ 50</span>
+                            </div>
+                        </div>
+                        <div class="validation-message" id="childNameValidation">
+                            ⚠️ Solo se permiten letras, espacios, puntos y apóstrofes
+                        </div>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="form-group">
+                        <label for="childEmail">
+                            Email
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="email" id="childEmail" placeholder="Ej: carlos@email.com"
+                                autocomplete="off">
+                        </div>
+                        <small style="font-size: 0.7rem; color: #666;">Este será su usuario para iniciar sesión</small>
+                        <div class="validation-message" id="childEmailValidation">
+                            ⚠️ Ingresa un correo electrónico válido (ej: usuario@dominio.com)
+                        </div>
+                    </div>
+
+                    <!-- CONTRASEÑA -->
+                    <div class="form-group">
+                        <label for="childPassword">
+                            Contraseña
+                            <span class="required">*</span>
+                            <span style="font-weight: normal; font-size: 0.75rem; color: #999;">
+                                (Mín. 6 caracteres)
+                            </span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="password" id="childPassword" placeholder="Mínimo 6 caracteres"
+                                minlength="6" autocomplete="new-password">
+                        </div>
+                        <small style="font-size: 0.7rem; color: #666;">Mínimo 6 caracteres</small>
+                        <div class="validation-message" id="childPasswordValidation">
+                            ⚠️ La contraseña debe tener al menos 6 caracteres
+                        </div>
+                    </div>
+
+                    <!-- EDAD (SOLO NÚMEROS) -->
+                    <div class="form-group">
+                        <label for="childAge">
+                            Edad
+                            <span class="required">*</span>
+                            <span style="font-weight: normal; font-size: 0.75rem; color: #999;">
+                                (1-18 años)
+                            </span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="text" id="childAge" placeholder="Ej: 10"
+                                maxlength="2" autocomplete="off"
+                                inputmode="numeric" pattern="[0-9]*">
+                            <div class="char-counter" style="text-align: left; font-size: 0.7rem; color: #999; margin-top: 0.2rem;">
+                                <span>🔢 Solo números</span>
+                            </div>
+                        </div>
+                        <div class="validation-message" id="childAgeValidation">
+                            ⚠️ La edad debe estar entre 1 y 18 años
+                        </div>
+                    </div>
+
+                    <!-- COLEGIO -->
+                    <div class="form-group">
+                        <label for="childSchool">
+                            Colegio/Institución
+                            <span style="font-weight: normal; font-size: 0.75rem; color: #999;">
+                                (Máx. 100 caracteres)
+                            </span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="text" id="childSchool" placeholder="Ej: Colegio San José"
+                                maxlength="100" autocomplete="off">
+                            <div class="char-counter">
+                                <span class="current">0</span>
+                                <span class="limit">/ 100</span>
+                            </div>
+                        </div>
+                        <div class="validation-message" id="childSchoolValidation">
+                            ⚠️ Solo se permiten letras, números, espacios, puntos y apóstrofes
+                        </div>
+                    </div>
+
+                    <!-- GRADO -->
+                    <div class="form-group">
+                        <label for="childGrade">Grado/Nivel</label>
+                        <div class="input-with-validation">
+                            <select id="childGrade">
+                                <option value="">Selecciona un grado</option>
+                                <option value="Preescolar">Preescolar</option>
+                                <option value="1° Primaria">1° Año de Educación Básica</option>
+                                <option value="2° Primaria">2° Año de Educación Básica</option>
+                                <option value="3° Primaria">3° Año de Educación Básica</option>
+                                <option value="4° Primaria">4° Año de Educación Básica</option>
+                                <option value="5° Primaria">5° Año de Educación Básica</option>
+                                <option value="6° Primaria">6° Año de Educación Básica</option>
+                                <option value="7° Primaria">7° Año de Educación Básica</option>
+                                <option value="1° Secundaria">8° Año de Educación Básica</option>
+                                <option value="2° Secundaria">9° Año de Educación Básica</option>
+                                <option value="3° Secundaria">10° Año de Educación Básica</option>
+                                <option value="4° Secundaria">1° de Bachillerato</option>
+                                <option value="5° Secundaria">2° de Bachillerato</option>
+                                <option value="6° Secundaria">3° de Bachillerato</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- AVATAR -->
+                    <div class="form-group">
+                        <label for="childAvatar">Avatar</label>
+                        <div class="input-with-validation">
+                            <select id="childAvatar">
+                                <option value="👦">👦 Niño</option>
+                                <option value="👧">👧 Niña</option>
+                                <option value="🧒">🧒 Niño</option>
+                                <option value="🧑">🧑 Niño</option>
+                                <option value="👶">👶 Bebé</option>
+                                <option value="🧸">🧸 Osito</option>
+                                <option value="🐱">🐱 Gato</option>
+                                <option value="🐶">🐶 Perro</option>
+                                <option value="🦊">🦊 Zorro</option>
+                                <option value="🐼">🐼 Panda</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelChildForm">Cancelar</button>
+                        <button type="submit" class="btn-primary" id="submitBtn">Registrar hijo</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de hijos registrados -->
+            <div class="children-section">
+                <div class="children-header">
+                    <h2>Hijos Registrados</h2>
+                    <span id="childCounter" style="font-size: 0.9rem; color: #666;"></span>
+                </div>
+                <div id="childrenContainer">
+                    <!-- Aquí se mostrarán los hijos -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mensaje de notificación -->
+    <div class="notification" id="notification">
+        ✅ Hijo registrado correctamente
+    </div>
+
+    <script src="js/hijos.js"></script>
+    <script>
+        // ============================================
+        // ===== VALIDACIONES EN TIEMPO REAL =====
+        // ============================================
+
+        // ===== PATRONES DE VALIDACIÓN =====
+        const VALIDATION_PATTERNS = {
+            // Solo letras, espacios, puntos, apóstrofes, tildes y ñ
+            name: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\.']*$/,
+            // Solo letras, números, espacios, puntos, apóstrofes, tildes y ñ
+            school: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.']*$/,
+            // Email básico
+            email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        };
+
+        // ===== ELEMENTOS DEL DOM =====
+        const childName = document.getElementById('childName');
+        const childEmail = document.getElementById('childEmail');
+        const childPassword = document.getElementById('childPassword');
+        const childAge = document.getElementById('childAge');
+        const childSchool = document.getElementById('childSchool');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // ===== ELEMENTOS DE VALIDACIÓN =====
+        const nameValidation = document.getElementById('childNameValidation');
+        const emailValidation = document.getElementById('childEmailValidation');
+        const passwordValidation = document.getElementById('childPasswordValidation');
+        const ageValidation = document.getElementById('childAgeValidation');
+        const schoolValidation = document.getElementById('childSchoolValidation');
+
+        // ===== CONTADORES DE CARACTERES =====
+        const nameCounter = childName.parentElement.querySelector('.char-counter .current');
+        const schoolCounter = childSchool.parentElement.querySelector('.char-counter .current');
+
+        // ============================================
+        // ===== FUNCIONES DE VALIDACIÓN =====
+        // ============================================
+
+        function validateField(value, pattern, minLength = 0, maxLength = Infinity) {
+            if (value.length < minLength) return { valid: false, message: `Mínimo ${minLength} caracteres` };
+            if (value.length > maxLength) return { valid: false, message: `Máximo ${maxLength} caracteres` };
+            if (!pattern.test(value) && value.length > 0) {
+                return { valid: false, message: 'Caracteres no permitidos' };
+            }
+            return { valid: true, message: '' };
+        }
+
+        function showValidationMessage(element, message, type = 'error') {
+            element.textContent = message;
+            element.className = `validation-message show ${type}`;
+        }
+
+        function hideValidationMessage(element) {
+            element.className = 'validation-message';
+            element.textContent = '';
+        }
+
+        function setInputStatus(input, isValid) {
+            input.classList.remove('valid', 'invalid');
+            if (isValid && input.value.length > 0) {
+                input.classList.add('valid');
+            } else if (!isValid && input.value.length > 0) {
+                input.classList.add('invalid');
+            }
+        }
+
+        function showTemporaryMessage(message, validationId) {
+            const validationEl = document.getElementById(validationId);
+            if (validationEl) {
+                showValidationMessage(validationEl, message, 'error');
+                clearTimeout(validationEl._timeout);
+                validationEl._timeout = setTimeout(() => {
+                    hideValidationMessage(validationEl);
+                }, 3000);
+            }
+        }
+
+        // ============================================
+        // ===== VALIDACIÓN: NOMBRE =====
+        // ============================================
+        childName.addEventListener('input', function() {
+            const value = this.value;
+            const maxLength = 50;
+
+            // Actualizar contador
+            nameCounter.textContent = value.length;
+
+            // Color del contador
+            const counter = this.parentElement.querySelector('.char-counter');
+            counter.classList.remove('warning', 'danger');
+            if (value.length > maxLength * 0.8) {
+                counter.classList.add('warning');
+            }
+            if (value.length >= maxLength) {
+                counter.classList.add('danger');
+            }
+
+            if (value.length === 0) {
+                hideValidationMessage(nameValidation);
+                setInputStatus(this, false);
+                return;
+            }
+
+            const result = validateField(value, VALIDATION_PATTERNS.name, 0, maxLength);
+
+            if (!result.valid) {
+                showValidationMessage(nameValidation, `⚠️ ${result.message}`, 'error');
+                setInputStatus(this, false);
+            } else {
+                hideValidationMessage(nameValidation);
+                setInputStatus(this, true);
+            }
+        });
+
+        // ============================================
+        // ===== VALIDACIÓN: EMAIL =====
+        // ============================================
+        childEmail.addEventListener('input', function() {
+            const value = this.value;
+
+            if (value.length === 0) {
+                hideValidationMessage(emailValidation);
+                setInputStatus(this, false);
+                return;
+            }
+
+            if (!VALIDATION_PATTERNS.email.test(value)) {
+                showValidationMessage(emailValidation, '⚠️ Ingresa un correo electrónico válido', 'error');
+                setInputStatus(this, false);
+            } else {
+                hideValidationMessage(emailValidation);
+                setInputStatus(this, true);
+            }
+        });
+
+        // ============================================
+        // ===== VALIDACIÓN: CONTRASEÑA =====
+        // ============================================
+        childPassword.addEventListener('input', function() {
+            const value = this.value;
+            const minLength = 6;
+
+            if (value.length === 0) {
+                hideValidationMessage(passwordValidation);
+                setInputStatus(this, false);
+                return;
+            }
+
+            if (value.length < minLength) {
+                showValidationMessage(passwordValidation, `⚠️ Mínimo ${minLength} caracteres (${value.length}/${minLength})`, 'error');
+                setInputStatus(this, false);
+            } else {
+                hideValidationMessage(passwordValidation);
+                setInputStatus(this, true);
+            }
+        });
+
+        // ============================================
+        // ===== VALIDACIÓN: EDAD (SOLO NÚMEROS) =====
+        // ============================================
+
+        // Bloquear caracteres no numéricos en tiempo real
+        childAge.addEventListener('keydown', function(e) {
+            // Permitir teclas de control
+            const controlKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
+                'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'
+            ];
+            if (controlKeys.includes(e.key)) {
+                return;
+            }
+
+            // Permitir solo números
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+                this.classList.add('shake');
+                setTimeout(() => this.classList.remove('shake'), 300);
+                showTemporaryMessage('⚠️ Solo se permiten números', 'childAgeValidation');
+            }
+        });
+
+        // Validar al pegar texto
+        childAge.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            const numbersOnly = pastedText.replace(/[^0-9]/g, '');
+            if (numbersOnly) {
+                this.value = numbersOnly;
+                this.dispatchEvent(new Event('input'));
+            }
+            showTemporaryMessage('⚠️ Solo se permiten números', 'childAgeValidation');
+        });
+
+        // Validación en tiempo real
+        childAge.addEventListener('input', function() {
+            // Limpiar caracteres no numéricos
+            this.value = this.value.replace(/[^0-9]/g, '');
+
+            // Limitar a 2 dígitos
+            if (this.value.length > 2) {
+                this.value = this.value.slice(0, 2);
+            }
+
+            const value = parseInt(this.value);
+            const min = 1;
+            const max = 18;
+
+            // Si está vacío
+            if (this.value.length === 0) {
+                hideValidationMessage(ageValidation);
+                setInputStatus(this, false);
+                return;
+            }
+
+            // Validar rango de edad
+            if (isNaN(value) || value < min || value > max) {
+                showValidationMessage(ageValidation, `⚠️ La edad debe estar entre ${min} y ${max} años`, 'error');
+                setInputStatus(this, false);
+            } else {
+                hideValidationMessage(ageValidation);
+                setInputStatus(this, true);
+            }
+        });
+
+        // Validar al perder el foco
+        childAge.addEventListener('blur', function() {
+            if (this.value.length > 0) {
+                const value = parseInt(this.value);
+                if (value < 1) this.value = '1';
+                if (value > 18) this.value = '18';
+                this.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // ============================================
+        // ===== VALIDACIÓN: COLEGIO =====
+        // ============================================
+        childSchool.addEventListener('input', function() {
+            const value = this.value;
+            const maxLength = 100;
+
+            // Actualizar contador
+            schoolCounter.textContent = value.length;
+
+            // Color del contador
+            const counter = this.parentElement.querySelector('.char-counter');
+            counter.classList.remove('warning', 'danger');
+            if (value.length > maxLength * 0.8) {
+                counter.classList.add('warning');
+            }
+            if (value.length >= maxLength) {
+                counter.classList.add('danger');
+            }
+
+            if (value.length === 0) {
+                hideValidationMessage(schoolValidation);
+                setInputStatus(this, false);
+                return;
+            }
+
+            const result = validateField(value, VALIDATION_PATTERNS.school, 0, maxLength);
+
+            if (!result.valid) {
+                showValidationMessage(schoolValidation, `⚠️ ${result.message}`, 'error');
+                setInputStatus(this, false);
+            } else {
+                hideValidationMessage(schoolValidation);
+                setInputStatus(this, true);
+            }
+        });
+
+        // ============================================
+        // ===== VALIDACIÓN ANTES DE ENVIAR =====
+        // ============================================
+        document.getElementById('childForm').addEventListener('submit', function(e) {
+            // Disparar validaciones en todos los campos
+            childName.dispatchEvent(new Event('input'));
+            childEmail.dispatchEvent(new Event('input'));
+            childPassword.dispatchEvent(new Event('input'));
+            childAge.dispatchEvent(new Event('input'));
+
+            // Verificar si hay errores visibles
+            const errorMessages = document.querySelectorAll('.validation-message.show.error');
+
+            if (errorMessages.length > 0) {
+                e.preventDefault();
+                // Scroll al primer error
+                errorMessages[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showNotification('⚠️ Por favor, corrige los errores en el formulario');
+                return false;
+            }
+
+            // Verificar campos obligatorios
+            const requiredFields = ['childName', 'childEmail', 'childPassword', 'childAge'];
+            let hasError = false;
+
+            requiredFields.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field.value.trim()) {
+                    hasError = true;
+                    field.classList.add('invalid');
+                    const validationEl = document.getElementById(`${id}Validation`);
+                    if (validationEl) {
+                        showValidationMessage(validationEl, `⚠️ Este campo es obligatorio`, 'error');
+                    }
+                }
+            });
+
+            if (hasError) {
+                e.preventDefault();
+                showNotification('⚠️ Por favor, completa todos los campos obligatorios');
+                return false;
+            }
+
+            // Si todo está bien, el formulario se enviará normalmente
+            return true;
+        });
+
+        // ============================================
+        // ===== RESETEAR VALIDACIONES AL CERRAR =====
+        // ============================================
+        document.getElementById('cancelChildForm').addEventListener('click', function() {
+            // Resetear todos los campos de validación
+            document.querySelectorAll('.input-with-validation input').forEach(input => {
+                input.classList.remove('valid', 'invalid');
+            });
+            document.querySelectorAll('.validation-message').forEach(el => {
+                el.className = 'validation-message';
+                el.textContent = '';
+            });
+            // Resetear contadores
+            document.querySelectorAll('.char-counter .current').forEach(el => {
+                el.textContent = '0';
+            });
+            document.querySelectorAll('.char-counter').forEach(el => {
+                el.classList.remove('warning', 'danger');
+            });
+        });
+
+        // ============================================
+        // ===== FUNCIÓN DE NOTIFICACIÓN =====
+        // ============================================
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        console.log('✅ Validaciones de caracteres activadas');
+    </script>
+</body>
+
+</html>

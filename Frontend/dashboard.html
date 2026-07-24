@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hourglass</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <style>
+        /* ===== ESTILOS PARA VALIDACIONES ===== */
+        .form-group {
+            position: relative;
+        }
+
+        .validation-message {
+            display: none;
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.2rem;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .validation-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .validation-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .validation-message.show {
+            display: block;
+        }
+
+        .input-with-validation {
+            position: relative;
+        }
+
+        .input-with-validation input,
+        .input-with-validation select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid var(--border-input-color);
+            border-radius: 0.3rem;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-with-validation input:focus,
+        .input-with-validation select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(97, 61, 183, 0.1);
+        }
+
+        .input-with-validation input.invalid,
+        .input-with-validation select.invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
+
+        .input-with-validation input.valid,
+        .input-with-validation select.valid {
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        /* ===== CONTADOR DE CARACTERES ===== */
+        .char-counter {
+            font-size: 0.7rem;
+            color: #999;
+            text-align: right;
+            margin-top: 0.2rem;
+        }
+
+        .char-counter .current {
+            font-weight: 600;
+        }
+
+        .char-counter .limit {
+            color: #666;
+        }
+
+        .char-counter.warning .current {
+            color: #ffc107;
+        }
+
+        .char-counter.danger .current {
+            color: #dc3545;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== INDICADORES DE CAMPO OBLIGATORIO ===== */
+        .form-group label .required {
+            color: #dc3545;
+            margin-left: 2px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .validation-message {
+                font-size: 0.7rem;
+            }
+            
+            .char-counter {
+                font-size: 0.65rem;
+            }
+        }
+
+        /* ===== ESTILOS ADICIONALES ===== */
+        .task-card .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .task-card .btn-edit-task {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: none;
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .task-card .btn-edit-task:hover {
+            background: #bbdefb;
+            transform: scale(1.05);
+        }
+
+        .task-card .delete-task-btn {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .task-card .delete-task-btn:hover {
+            background-color: #ffebee;
+            color: #f44336;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav">
+        <div class="nav_container">
+            <figure class="nav_figure">
+                <img src="./icons/logo.svg" class="nav_logo" alt="Hourglass Logo">
+            </figure>
+
+            <button class="nav_toggle" id="menuToggle" aria-label="Abrir menú">
+                <img src="./icons/menu-open.svg" alt="Abrir menú" class="menu-icon" id="menuIcon">
+            </button>
+
+            <ul class="nav_list" id="navList">
+                <li class="nav_item">
+                    <a href="#" class="nav_link active">Inicio</a>
+                </li>
+                <li class="nav_item">
+                    <a href="reporte.html" class="nav_link">Reporte</a>
+                </li>
+                <li class="nav_item">
+                    <a href="calendario.html" class="nav_link">Calendario</a>
+                </li>
+                <li class="nav_item">
+                    <a href="hijos.html" class="nav_link">Hijos</a>
+                </li>
+                <li class="nav_item">
+                    <a href="#" id="logoutLink" class="nav_link" style="color: #f44336; font-weight: 600;">
+                        🚪 Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenido principal del dashboard -->
+    <main class="main-content">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>Panel de Control</h1>
+                <button class="btn-primary" id="openTaskForm">+ Asignar nueva tarea</button>
+            </div>
+
+            <!-- Formulario de tareas (oculto inicialmente) -->
+            <div class="task-form-container" id="taskFormContainer">
+                <form class="task-form" id="taskForm" novalidate>
+                    <h2>Asignar Nueva Tarea</h2>
+
+                    <!-- NOMBRE DE LA TAREA -->
+                    <div class="form-group">
+                        <label for="taskName">
+                            Nombre de la tarea
+                            <span class="required">*</span>
+                            <span style="font-weight: normal; font-size: 0.75rem; color: #999;">
+                                (Máx. 100 caracteres)
+                            </span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="text" id="taskName" placeholder="Ej: Hacer la tarea de matemáticas" 
+                                   maxlength="100" autocomplete="off">
+                            <div class="char-counter">
+                                <span class="current">0</span>
+                                <span class="limit">/ 100</span>
+                            </div>
+                        </div>
+                        <div class="validation-message" id="taskNameValidation">
+                            ⚠️ Solo se permiten letras, números, espacios, puntos y apóstrofes
+                        </div>
+                    </div>
+
+                    <!-- ASIGNATURA -->
+                    <div class="form-group">
+                        <label for="taskSubject">
+                            Asignatura
+                            <span class="required">*</span>
+                            <span style="font-weight: normal; font-size: 0.75rem; color: #999;">
+                                (Máx. 50 caracteres)
+                            </span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="text" id="taskSubject" placeholder="Ej: Matemáticas, Lengua, Ciencias" 
+                                   maxlength="50" autocomplete="off">
+                            <div class="char-counter">
+                                <span class="current">0</span>
+                                <span class="limit">/ 50</span>
+                            </div>
+                        </div>
+                        <div class="validation-message" id="taskSubjectValidation">
+                            ⚠️ Solo se permiten letras, números, espacios, puntos y apóstrofes
+                        </div>
+                    </div>
+
+                    <!-- PRIORIDAD -->
+                    <div class="form-group">
+                        <label for="taskPriority">
+                            Prioridad
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-validation">
+                            <select id="taskPriority" required>
+                                <option value="">Selecciona una prioridad</option>
+                                <option value="baja">🟢 Baja</option>
+                                <option value="media">🟡 Media</option>
+                                <option value="alta">🔴 Alta</option>
+                            </select>
+                        </div>
+                        <div class="validation-message" id="taskPriorityValidation">
+                            ⚠️ Por favor, selecciona una prioridad
+                        </div>
+                    </div>
+
+                    <!-- FECHA LÍMITE -->
+                    <div class="form-group">
+                        <label for="taskDeadline">
+                            Fecha límite de entrega
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="date" id="taskDeadline" required>
+                        </div>
+                        <div class="validation-message" id="taskDeadlineValidation">
+                            ⚠️ Por favor, selecciona una fecha límite válida
+                        </div>
+                    </div>
+
+                    <!-- ASIGNAR A -->
+                    <div class="form-group">
+                        <label for="taskChild">
+                            Asignar a:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-validation">
+                            <select id="taskChild" required>
+                                <option value="">Selecciona un hijo</option>
+                                <!-- Los hijos se cargarán dinámicamente desde JavaScript -->
+                            </select>
+                        </div>
+                        <div class="validation-message" id="taskChildValidation">
+                            ⚠️ Por favor, selecciona un hijo
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelTask">Cancelar</button>
+                        <button type="submit" class="btn-primary">Asignar tarea</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Formulario de edición de tareas (oculto inicialmente) -->
+            <div class="task-form-container" id="editTaskFormContainer">
+                <form class="task-form" id="editTaskForm" novalidate>
+                    <h2>✏️ Editar Tarea</h2>
+                    
+                    <input type="hidden" id="editTaskId">
+                    
+                    <!-- NOMBRE DE LA TAREA (EDITAR) -->
+                    <div class="form-group">
+                        <label for="editTaskName">
+                            Nombre de la tarea
+                            <span class="required">*</span>
+                            <span style="font-weight: normal; font-size: 0.75rem; color: #999;">
+                                (Máx. 100 caracteres)
+                            </span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="text" id="editTaskName" placeholder="Ej: Hacer la tarea de matemáticas" 
+                                   maxlength="100" autocomplete="off">
+                            <div class="char-counter">
+                                <span class="current">0</span>
+                                <span class="limit">/ 100</span>
+                            </div>
+                        </div>
+                        <div class="validation-message" id="editTaskNameValidation">
+                            ⚠️ Solo se permiten letras, números, espacios, puntos y apóstrofes
+                        </div>
+                    </div>
+                    
+                    <!-- ASIGNATURA (EDITAR) -->
+                    <div class="form-group">
+                        <label for="editTaskSubject">
+                            Asignatura
+                            <span class="required">*</span>
+                            <span style="font-weight: normal; font-size: 0.75rem; color: #999;">
+                                (Máx. 50 caracteres)
+                            </span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="text" id="editTaskSubject" placeholder="Ej: Matemáticas, Lengua, Ciencias" 
+                                   maxlength="50" autocomplete="off">
+                            <div class="char-counter">
+                                <span class="current">0</span>
+                                <span class="limit">/ 50</span>
+                            </div>
+                        </div>
+                        <div class="validation-message" id="editTaskSubjectValidation">
+                            ⚠️ Solo se permiten letras, números, espacios, puntos y apóstrofes
+                        </div>
+                    </div>
+                    
+                    <!-- PRIORIDAD (EDITAR) -->
+                    <div class="form-group">
+                        <label for="editTaskPriority">
+                            Prioridad
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-validation">
+                            <select id="editTaskPriority" required>
+                                <option value="">Selecciona una prioridad</option>
+                                <option value="baja">🟢 Baja</option>
+                                <option value="media">🟡 Media</option>
+                                <option value="alta">🔴 Alta</option>
+                            </select>
+                        </div>
+                        <div class="validation-message" id="editTaskPriorityValidation">
+                            ⚠️ Por favor, selecciona una prioridad
+                        </div>
+                    </div>
+                    
+                    <!-- FECHA LÍMITE (EDITAR) -->
+                    <div class="form-group">
+                        <label for="editTaskDeadline">
+                            Fecha límite de entrega
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="date" id="editTaskDeadline" required>
+                        </div>
+                        <div class="validation-message" id="editTaskDeadlineValidation">
+                            ⚠️ Por favor, selecciona una fecha límite válida
+                        </div>
+                    </div>
+                    
+                    <!-- ASIGNAR A (EDITAR) -->
+                    <div class="form-group">
+                        <label for="editTaskChild">
+                            Asignar a:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-validation">
+                            <select id="editTaskChild" required>
+                                <option value="">Selecciona un hijo</option>
+                                <!-- Los hijos se cargarán dinámicamente desde JavaScript -->
+                            </select>
+                        </div>
+                        <div class="validation-message" id="editTaskChildValidation">
+                            ⚠️ Por favor, selecciona un hijo
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelEditTask">Cancelar</button>
+                        <button type="submit" class="btn-primary">Actualizar tarea</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sección de tareas asignadas -->
+            <div class="tasks-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <h2>Tareas Asignadas</h2>
+                    <span id="taskCounter" style="font-size: 0.9rem; color: #666;"></span>
+                </div>
+                <div id="tasksContainer">
+                    <!-- Aquí se mostrarán las tareas -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mensaje de notificación -->
+    <div class="notification" id="notification">
+        ✅ Tarea asignada correctamente
+    </div>
+
+    <script src="js/dashboard.js"></script>
+    <script>
+        // ============================================
+        // ===== VALIDACIONES EN TIEMPO REAL =====
+        // ============================================
+
+        // ===== PATRONES DE VALIDACIÓN =====
+        const TASK_VALIDATION_PATTERNS = {
+            // Letras, números, espacios, puntos, apóstrofes, tildes y ñ
+            text: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.']*$/,
+        };
+
+        // ============================================
+        // ===== FUNCIONES DE VALIDACIÓN =====
+        // ============================================
+
+        function showTaskValidationMessage(element, message, type = 'error') {
+            if (!element) return;
+            element.textContent = message;
+            element.className = `validation-message show ${type}`;
+        }
+
+        function hideTaskValidationMessage(element) {
+            if (!element) return;
+            element.className = 'validation-message';
+            element.textContent = '';
+        }
+
+        function setTaskInputStatus(input, isValid) {
+            if (!input) return;
+            input.classList.remove('valid', 'invalid');
+            if (isValid && input.value.length > 0) {
+                input.classList.add('valid');
+            } else if (!isValid && input.value.length > 0) {
+                input.classList.add('invalid');
+            }
+        }
+
+        function validateTaskField(value, pattern, minLength = 0, maxLength = Infinity) {
+            if (value.length < minLength) return { valid: false, message: `Mínimo ${minLength} caracteres` };
+            if (value.length > maxLength) return { valid: false, message: `Máximo ${maxLength} caracteres` };
+            if (!pattern.test(value) && value.length > 0) {
+                return { valid: false, message: 'Caracteres no permitidos' };
+            }
+            return { valid: true, message: '' };
+        }
+
+        // ============================================
+        // ===== CONFIGURAR VALIDACIONES =====
+        // ============================================
+
+        function setupTaskValidations() {
+            // ===== VALIDACIÓN: NOMBRE DE TAREA =====
+            const taskName = document.getElementById('taskName');
+            const taskNameValidation = document.getElementById('taskNameValidation');
+            const taskNameCounter = document.querySelector('#taskName + .char-counter .current');
+
+            if (taskName) {
+                taskName.addEventListener('input', function() {
+                    const value = this.value;
+                    const maxLength = 100;
+                    
+                    if (taskNameCounter) taskNameCounter.textContent = value.length;
+                    
+                    const counter = this.parentElement.querySelector('.char-counter');
+                    if (counter) {
+                        counter.classList.remove('warning', 'danger');
+                        if (value.length > maxLength * 0.8) counter.classList.add('warning');
+                        if (value.length >= maxLength) counter.classList.add('danger');
+                    }
+                    
+                    if (value.length === 0) {
+                        hideTaskValidationMessage(taskNameValidation);
+                        setTaskInputStatus(this, false);
+                        return;
+                    }
+                    
+                    const result = validateTaskField(value, TASK_VALIDATION_PATTERNS.text, 0, maxLength);
+                    
+                    if (!result.valid) {
+                        showTaskValidationMessage(taskNameValidation, `⚠️ ${result.message}`, 'error');
+                        setTaskInputStatus(this, false);
+                    } else {
+                        hideTaskValidationMessage(taskNameValidation);
+                        setTaskInputStatus(this, true);
+                    }
+                });
+            }
+
+            // ===== VALIDACIÓN: ASIGNATURA =====
+            const taskSubject = document.getElementById('taskSubject');
+            const taskSubjectValidation = document.getElementById('taskSubjectValidation');
+            const taskSubjectCounter = document.querySelector('#taskSubject + .char-counter .current');
+
+            if (taskSubject) {
+                taskSubject.addEventListener('input', function() {
+                    const value = this.value;
+                    const maxLength = 50;
+                    
+                    if (taskSubjectCounter) taskSubjectCounter.textContent = value.length;
+                    
+                    const counter = this.parentElement.querySelector('.char-counter');
+                    if (counter) {
+                        counter.classList.remove('warning', 'danger');
+                        if (value.length > maxLength * 0.8) counter.classList.add('warning');
+                        if (value.length >= maxLength) counter.classList.add('danger');
+                    }
+                    
+                    if (value.length === 0) {
+                        hideTaskValidationMessage(taskSubjectValidation);
+                        setTaskInputStatus(this, false);
+                        return;
+                    }
+                    
+                    const result = validateTaskField(value, TASK_VALIDATION_PATTERNS.text, 0, maxLength);
+                    
+                    if (!result.valid) {
+                        showTaskValidationMessage(taskSubjectValidation, `⚠️ ${result.message}`, 'error');
+                        setTaskInputStatus(this, false);
+                    } else {
+                        hideTaskValidationMessage(taskSubjectValidation);
+                        setTaskInputStatus(this, true);
+                    }
+                });
+            }
+
+            // ===== VALIDACIÓN: PRIORIDAD =====
+            const taskPriority = document.getElementById('taskPriority');
+            const taskPriorityValidation = document.getElementById('taskPriorityValidation');
+
+            if (taskPriority) {
+                taskPriority.addEventListener('change', function() {
+                    if (this.value) {
+                        hideTaskValidationMessage(taskPriorityValidation);
+                        setTaskInputStatus(this, true);
+                    } else {
+                        showTaskValidationMessage(taskPriorityValidation, '⚠️ Por favor, selecciona una prioridad', 'error');
+                        setTaskInputStatus(this, false);
+                    }
+                });
+            }
+
+            // ===== VALIDACIÓN: FECHA LÍMITE =====
+            const taskDeadline = document.getElementById('taskDeadline');
+            const taskDeadlineValidation = document.getElementById('taskDeadlineValidation');
+
+            if (taskDeadline) {
+                taskDeadline.addEventListener('change', function() {
+                    if (this.value) {
+                        hideTaskValidationMessage(taskDeadlineValidation);
+                        setTaskInputStatus(this, true);
+                    } else {
+                        showTaskValidationMessage(taskDeadlineValidation, '⚠️ Por favor, selecciona una fecha límite válida', 'error');
+                        setTaskInputStatus(this, false);
+                    }
+                });
+            }
+
+            // ===== VALIDACIÓN: ASIGNAR A =====
+            const taskChild = document.getElementById('taskChild');
+            const taskChildValidation = document.getElementById('taskChildValidation');
+
+            if (taskChild) {
+                taskChild.addEventListener('change', function() {
+                    if (this.value) {
+                        hideTaskValidationMessage(taskChildValidation);
+                        setTaskInputStatus(this, true);
+                    } else {
+                        showTaskValidationMessage(taskChildValidation, '⚠️ Por favor, selecciona un hijo', 'error');
+                        setTaskInputStatus(this, false);
+                    }
+                });
+            }
+
+            // ============================================
+            // ===== VALIDACIONES PARA EDITAR =====
+            // ============================================
+
+            // Editar - Nombre
+            const editTaskName = document.getElementById('editTaskName');
+            const editTaskNameValidation = document.getElementById('editTaskNameValidation');
+            const editTaskNameCounter = document.querySelector('#editTaskName + .char-counter .current');
+
+            if (editTaskName) {
+                editTaskName.addEventListener('input', function() {
+                    const value = this.value;
+                    const maxLength = 100;
+                    
+                    if (editTaskNameCounter) editTaskNameCounter.textContent = value.length;
+                    
+                    const counter = this.parentElement.querySelector('.char-counter');
+                    if (counter) {
+                        counter.classList.remove('warning', 'danger');
+                        if (value.length > maxLength * 0.8) counter.classList.add('warning');
+                        if (value.length >= maxLength) counter.classList.add('danger');
+                    }
+                    
+                    if (value.length === 0) {
+                        hideTaskValidationMessage(editTaskNameValidation);
+                        setTaskInputStatus(this, false);
+                        return;
+                    }
+                    
+                    const result = validateTaskField(value, TASK_VALIDATION_PATTERNS.text, 0, maxLength);
+                    
+                    if (!result.valid) {
+                        showTaskValidationMessage(editTaskNameValidation, `⚠️ ${result.message}`, 'error');
+                        setTaskInputStatus(this, false);
+                    } else {
+                        hideTaskValidationMessage(editTaskNameValidation);
+                        setTaskInputStatus(this, true);
+                    }
+                });
+            }
+
+            // Editar - Asignatura
+            const editTaskSubject = document.getElementById('editTaskSubject');
+            const editTaskSubjectValidation = document.getElementById('editTaskSubjectValidation');
+            const editTaskSubjectCounter = document.querySelector('#editTaskSubject + .char-counter .current');
+
+            if (editTaskSubject) {
+                editTaskSubject.addEventListener('input', function() {
+                    const value = this.value;
+                    const maxLength = 50;
+                    
+                    if (editTaskSubjectCounter) editTaskSubjectCounter.textContent = value.length;
+                    
+                    const counter = this.parentElement.querySelector('.char-counter');
+                    if (counter) {
+                        counter.classList.remove('warning', 'danger');
+                        if (value.length > maxLength * 0.8) counter.classList.add('warning');
+                        if (value.length >= maxLength) counter.classList.add('danger');
+                    }
+                    
+                    if (value.length === 0) {
+                        hideTaskValidationMessage(editTaskSubjectValidation);
+                        setTaskInputStatus(this, false);
+                        return;
+                    }
+                    
+                    const result = validateTaskField(value, TASK_VALIDATION_PATTERNS.text, 0, maxLength);
+                    
+                    if (!result.valid) {
+                        showTaskValidationMessage(editTaskSubjectValidation, `⚠️ ${result.message}`, 'error');
+                        setTaskInputStatus(this, false);
+                    } else {
+                        hideTaskValidationMessage(editTaskSubjectValidation);
+                        setTaskInputStatus(this, true);
+                    }
+                });
+            }
+
+            // Editar - Prioridad
+            const editTaskPriority = document.getElementById('editTaskPriority');
+            const editTaskPriorityValidation = document.getElementById('editTaskPriorityValidation');
+
+            if (editTaskPriority) {
+                editTaskPriority.addEventListener('change', function() {
+                    if (this.value) {
+                        hideTaskValidationMessage(editTaskPriorityValidation);
+                        setTaskInputStatus(this, true);
+                    } else {
+                        showTaskValidationMessage(editTaskPriorityValidation, '⚠️ Por favor, selecciona una prioridad', 'error');
+                        setTaskInputStatus(this, false);
+                    }
+                });
+            }
+
+            // Editar - Fecha límite
+            const editTaskDeadline = document.getElementById('editTaskDeadline');
+            const editTaskDeadlineValidation = document.getElementById('editTaskDeadlineValidation');
+
+            if (editTaskDeadline) {
+                editTaskDeadline.addEventListener('change', function() {
+                    if (this.value) {
+                        hideTaskValidationMessage(editTaskDeadlineValidation);
+                        setTaskInputStatus(this, true);
+                    } else {
+                        showTaskValidationMessage(editTaskDeadlineValidation, '⚠️ Por favor, selecciona una fecha límite válida', 'error');
+                        setTaskInputStatus(this, false);
+                    }
+                });
+            }
+
+            // Editar - Asignar a
+            const editTaskChild = document.getElementById('editTaskChild');
+            const editTaskChildValidation = document.getElementById('editTaskChildValidation');
+
+            if (editTaskChild) {
+                editTaskChild.addEventListener('change', function() {
+                    if (this.value) {
+                        hideTaskValidationMessage(editTaskChildValidation);
+                        setTaskInputStatus(this, true);
+                    } else {
+                        showTaskValidationMessage(editTaskChildValidation, '⚠️ Por favor, selecciona un hijo', 'error');
+                        setTaskInputStatus(this, false);
+                    }
+                });
+            }
+        }
+
+        // ============================================
+        // ===== VALIDACIÓN ANTES DE ENVIAR =====
+        // ============================================
+
+        // Validar formulario de nueva tarea
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+            // Disparar validaciones
+            document.getElementById('taskName').dispatchEvent(new Event('input'));
+            document.getElementById('taskSubject').dispatchEvent(new Event('input'));
+            document.getElementById('taskPriority').dispatchEvent(new Event('change'));
+            document.getElementById('taskDeadline').dispatchEvent(new Event('change'));
+            document.getElementById('taskChild').dispatchEvent(new Event('change'));
+
+            // Verificar errores
+            const errorMessages = document.querySelectorAll('#taskForm .validation-message.show.error');
+            
+            if (errorMessages.length > 0) {
+                e.preventDefault();
+                errorMessages[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showTaskNotification('⚠️ Por favor, corrige los errores en el formulario');
+                return false;
+            }
+
+            // Verificar campos vacíos
+            const requiredFields = ['taskName', 'taskSubject', 'taskPriority', 'taskDeadline', 'taskChild'];
+            let hasError = false;
+
+            requiredFields.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field.value.trim()) {
+                    hasError = true;
+                    field.classList.add('invalid');
+                    const validationEl = document.getElementById(`${id}Validation`);
+                    if (validationEl) {
+                        showTaskValidationMessage(validationEl, `⚠️ Este campo es obligatorio`, 'error');
+                    }
+                }
+            });
+
+            if (hasError) {
+                e.preventDefault();
+                showTaskNotification('⚠️ Por favor, completa todos los campos obligatorios');
+                return false;
+            }
+
+            return true;
+        });
+
+        // Validar formulario de edición
+        document.getElementById('editTaskForm').addEventListener('submit', function(e) {
+            // Disparar validaciones
+            document.getElementById('editTaskName').dispatchEvent(new Event('input'));
+            document.getElementById('editTaskSubject').dispatchEvent(new Event('input'));
+            document.getElementById('editTaskPriority').dispatchEvent(new Event('change'));
+            document.getElementById('editTaskDeadline').dispatchEvent(new Event('change'));
+            document.getElementById('editTaskChild').dispatchEvent(new Event('change'));
+
+            // Verificar errores
+            const errorMessages = document.querySelectorAll('#editTaskForm .validation-message.show.error');
+            
+            if (errorMessages.length > 0) {
+                e.preventDefault();
+                errorMessages[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showTaskNotification('⚠️ Por favor, corrige los errores en el formulario');
+                return false;
+            }
+
+            // Verificar campos vacíos
+            const requiredFields = ['editTaskName', 'editTaskSubject', 'editTaskPriority', 'editTaskDeadline', 'editTaskChild'];
+            let hasError = false;
+
+            requiredFields.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field.value.trim()) {
+                    hasError = true;
+                    field.classList.add('invalid');
+                    const validationEl = document.getElementById(`${id}Validation`);
+                    if (validationEl) {
+                        showTaskValidationMessage(validationEl, `⚠️ Este campo es obligatorio`, 'error');
+                    }
+                }
+            });
+
+            if (hasError) {
+                e.preventDefault();
+                showTaskNotification('⚠️ Por favor, completa todos los campos obligatorios');
+                return false;
+            }
+
+            return true;
+        });
+
+        // ============================================
+        // ===== FUNCIÓN DE NOTIFICACIÓN =====
+        // ============================================
+
+        function showTaskNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============================================
+        // ===== INICIALIZAR VALIDACIONES =====
+        // ============================================
+
+        // Ejecutar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTaskValidations();
+            console.log('✅ Validaciones de tareas activadas');
+        });
+    </script>
+</body>
+
+</html>

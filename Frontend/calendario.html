@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario - Hourglass</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <style>
+        /* Estilos específicos para el calendario */
+        .calendar-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .calendar-nav button {
+            background: #f0f0f0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .calendar-nav button:hover {
+            background: #e0e0e0;
+        }
+
+        .calendar-nav .month-year {
+            font-size: 1.1rem;
+            font-weight: 600;
+            min-width: 150px;
+            text-align: center;
+            color: #333;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: default;
+            transition: all 0.2s;
+            position: relative;
+            min-height: 60px;
+            padding: 4px;
+        }
+
+        .calendar-day:not(.empty):not(.other-month) {
+            cursor: pointer;
+        }
+
+        .calendar-day:not(.empty):not(.other-month):hover {
+            background: #e3f2fd;
+            transform: scale(1.02);
+        }
+
+        .calendar-day .day-number {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .calendar-day.other-month .day-number {
+            color: #ccc;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+        }
+
+        .calendar-day.today {
+            background: #bbdefb;
+            border: 2px solid #1976d2;
+        }
+
+        .calendar-day.has-tasks {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+
+        .calendar-day.has-tasks.today {
+            background: #c8e6c9;
+            border: 2px solid #1976d2;
+        }
+
+        .calendar-day .task-indicator {
+            font-size: 0.7rem;
+            margin-top: 2px;
+            color: #4caf50;
+            font-weight: 600;
+        }
+
+        .calendar-day .task-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff5722;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Modal de tareas del día */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            padding: 0.2rem 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #f44336;
+        }
+
+        .modal-task {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #4caf50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .modal-task .task-info {
+            flex: 1;
+        }
+
+        .modal-task .task-info h4 {
+            margin: 0 0 0.3rem 0;
+            color: #333;
+        }
+
+        .modal-task .task-info .task-details {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .modal-task .task-info .task-details span {
+            margin-right: 1rem;
+        }
+
+        .modal-task .task-child {
+            background: #1976d2;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .modal-task.priority-baja {
+            border-left-color: #4caf50;
+        }
+
+        .modal-task.priority-media {
+            border-left-color: #ff9800;
+        }
+
+        .modal-task.priority-alta {
+            border-left-color: #f44336;
+        }
+
+        .no-tasks {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .no-tasks .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calendar-container {
+                padding: 1rem;
+            }
+
+            .calendar-day {
+                min-height: 40px;
+                font-size: 0.8rem;
+            }
+
+            .calendar-day .day-number {
+                font-size: 0.9rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .modal-task {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .calendar-day {
+                min-height: 35px;
+                font-size: 0.7rem;
+            }
+
+            .calendar-day .day-number {
+                font-size: 0.8rem;
+            }
+
+            .calendar-day .task-indicator {
+                font-size: 0.6rem;
+            }
+
+            .calendar-day .task-count {
+                width: 16px;
+                height: 16px;
+                font-size: 0.6rem;
+                top: -3px;
+                right: -3px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav">
+        <div class="nav_container">
+            <figure class="nav_figure">
+                <img src="./icons/logo.svg" class="nav_logo" alt="Hourglass Logo">
+            </figure>
+
+            <button class="nav_toggle" id="menuToggle" aria-label="Abrir menú">
+                <img src="./icons/menu-open.svg" alt="Abrir menú" class="menu-icon" id="menuIcon">
+            </button>
+
+            <ul class="nav_list" id="navList">
+                <li class="nav_item">
+                    <a href="dashboard.html" class="nav_link">Inicio</a>
+                </li>
+                <li class="nav_item">
+                    <a href="reporte.html" class="nav_link">Reporte</a>
+                </li>
+                <li class="nav_item">
+                    <a href="calendario.html" class="nav_link active">Calendario</a>
+                </li>
+                <li class="nav_item">
+                    <a href="hijos.html" class="nav_link">Hijos</a>
+                </li>
+                <li class="nav_item">
+                    <a href="#" id="logoutLink" class="nav_link" style="color: #f44336; font-weight: 600;">
+                        🚪 Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>📅 Calendario de Tareas</h1>
+                <span style="font-size: 0.9rem; color: #666;">Haz clic en un día con tareas para ver los detalles</span>
+            </div>
+
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <h2 id="currentMonthYear">Enero 2024</h2>
+                    <div class="calendar-nav">
+                        <button id="prevMonth">◀</button>
+                        <button id="nextMonth">▶</button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Los días del mes se generarán aquí -->
+                </div>
+
+                <!-- Leyenda -->
+                <div
+                    style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div
+                            style="width: 20px; height: 20px; background: #e8f5e9; border: 2px solid #4caf50; border-radius: 4px;">
+                        </div>
+                        <span style="font-size: 0.9rem;">Día con tareas</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div
+                            style="width: 20px; height: 20px; background: #bbdefb; border: 2px solid #1976d2; border-radius: 4px;">
+                        </div>
+                        <span style="font-size: 0.9rem;">Hoy</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div
+                            style="width: 20px; height: 20px; background: #f8f9fa; border: 2px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <span style="font-size: 0.9rem;">Día sin tareas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para mostrar tareas del día -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalDate">Tareas del día</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div id="modalTasksContainer">
+                <!-- Las tareas se mostrarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de notificación -->
+    <div class="notification" id="notification">
+        ✅ Tarea asignada correctamente
+    </div>
+
+    <script src="js/calendario.js"></script>
+</body>
+
+</html>
